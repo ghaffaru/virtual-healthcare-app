@@ -143,8 +143,6 @@ class _AppointmentsState extends State<Appointments> {
                 })
             : Center(
 //                mainAxisAlignment: MainAxisAlignment.center,
-                child:
-                  Text('You have no appointments')
-              ));
+                child: Text('You have no appointments')));
   }
 }

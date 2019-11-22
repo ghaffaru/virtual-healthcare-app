@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'dart:convert';
+import 'package:v_healthcare/view_prescription.dart';
 
 class Prescriptions extends StatefulWidget {
   final String token;
@@ -76,9 +77,11 @@ class _PrescriptionsState extends State<Prescriptions> {
                         FlatButton(
                           child: Text('view'),
                           onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(BuildContext context) => PrescriptionView) {
-
-                            }
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        PrescriptionView(idToken: widget.token, prescriptionId: data[index]['id'],)));
                           },
                         )
                       ],
