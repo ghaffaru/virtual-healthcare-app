@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'dart:convert';
-
+import 'package:v_healthcare/Chat.dart';
 class Appointments extends StatefulWidget {
   final String token;
+
+  String condition;
 
   Appointments(this.token);
 
@@ -133,9 +135,24 @@ class _AppointmentsState extends State<Appointments> {
                                   : 'Approved'),
 //                              SizedBox(width: 5,),
                               MaterialButton(
-                                  child: Text('Cancel'),
-                                  onPressed: () =>
-                                      confirmCancel(data[index]['id']))
+                                  child: Text(data[index]['approved'] == "0"
+                                      ? "Cancel"
+                                      : ""),
+                                  onPressed: () => confirmCancel(
+                                        data[index]['id'],
+                                      )),
+                              MaterialButton(
+                                child: Text(data[index]['approved'] == "0"
+                                    ? ""
+                                    : "Chat"),
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              Chat(idToken: widget.token, doctorId: data[index]['doctor_id'],)));
+                                },
+                              )
                             ],
                           ),
                         ],

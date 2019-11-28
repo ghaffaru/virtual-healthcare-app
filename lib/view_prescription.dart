@@ -49,7 +49,6 @@ class _PrescriptionViewState extends State<PrescriptionView> {
               FlatButton(
                 child: Text('Yes'),
                 onPressed: submitToPharmacist,
-
               ),
               FlatButton(
                 child: Text('Back'),
@@ -74,7 +73,7 @@ class _PrescriptionViewState extends State<PrescriptionView> {
           HttpHeaders.acceptHeader: 'application/json'
         },
         body: json.encode({'submitted': '1'}));
-    print(json.encode({'submitted' : '1'}));
+    print(json.encode({'submitted': '1'}));
     print(response.statusCode);
     if (response.statusCode == 200) {
       getPrescription();
@@ -82,7 +81,20 @@ class _PrescriptionViewState extends State<PrescriptionView> {
     }
   }
 
+  Future payForDrug() async {
+    final idToken = widget.idToken;
+    final prescriptionId = widget.prescriptionId;
 
+    final http.Response response = await http.get('http://10.0.2.2:8000/api/patient/pay/$prescriptionId',
+    headers: {
+      HttpHeaders.authorizationHeader: 'Bearer $idToken',
+      HttpHeaders.contentTypeHeader: 'application/json',
+      HttpHeaders.acceptHeader: 'application/json'
+    });
+
+    print(response.statusCode);
+    print(response.body);
+  }
 
   @override
   void initState() {
@@ -171,7 +183,9 @@ class _PrescriptionViewState extends State<PrescriptionView> {
             Divider(
               color: Colors.green[400],
             ),
-            SizedBox(height: 10,),
+            SizedBox(
+              height: 10,
+            ),
             data['submitted'] == "0"
                 ? FlatButton(
                     child: Text(
@@ -181,23 +195,36 @@ class _PrescriptionViewState extends State<PrescriptionView> {
                     onPressed: confirmSubmission,
                   )
                 : Text(
-                    'status : submitted ',textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.red, fontSize: 20 ),
+                    'status : submitted ',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.red, fontSize: 20),
                   ),
-            SizedBox(height: 10,),
-            if (data['submitted'] == "1" && data['drug_issued'] == "1") {
-              build(context)
-            }
-           
+            SizedBox(
+              height: 10,
+            ),
+            data['submitted'] == "1" && data['drug_issued'] == "1"
+                ? RaisedButton(
+//                   disabledColor: Color(10),
+                   elevation: 4,
+                    color: Colors.lightBlueAccent,
+                    child: Text(
+                      'pay for drug',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 15, color: Colors.black),
+
+                    ),
+                    onPressed: payForDrug,
+                  )
+                : data['submitted'] == "1" && data['drug_issued'] == "0"
+                    ? Text(
+                        "drug issued : pending",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 20),
+                      )
+                    : Text("")
           ],
         ),
       ),
     );
   }
 }
-
-data['submitted'] == "1" && data['drug_issued'] == "1" ?
-FlatButton(
-child: Text('pay for drug', textAlign: TextAlign.center, style: TextStyle(fontSize: 20),),
-)
-: Text("drug issued : pending", textAlign: TextAlign.center, style: TextStyle(fontSize: 20),),

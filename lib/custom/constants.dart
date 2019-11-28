@@ -1,2 +1,2 @@
-final clientSecret = '3izs6WWqB1UqLmP1nsqfSmtjFUnSkCURGevHakSs';
+final clientSecret = 'ucciLOxut8kCv175N9UZvRL2WANOq1ott7WVGbac';
 final url = 'http://10.0.2.2:8000/';

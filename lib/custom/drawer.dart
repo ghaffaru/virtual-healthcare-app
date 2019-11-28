@@ -4,8 +4,8 @@ import 'package:v_healthcare/appointments.dart';
 import 'package:v_healthcare/doctors.dart';
 import 'package:v_healthcare/ambulance.dart';
 import 'package:v_healthcare/prescriptions.dart';
-class DrawerWidget extends StatelessWidget {
 
+class DrawerWidget extends StatelessWidget {
   final String token;
 
   DrawerWidget({this.token});
@@ -19,7 +19,6 @@ class DrawerWidget extends StatelessWidget {
             title: Text('Choose'),
             automaticallyImplyLeading: false,
           ),
-
           ListTile(
             title: Text('Consult a doctor'),
             onTap: () {
@@ -27,8 +26,8 @@ class DrawerWidget extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                       builder: (BuildContext context) => Doctors(
-                        token: token,
-                      )));
+                            token: token,
+                          )));
             },
           ),
           ListTile(
@@ -52,7 +51,11 @@ class DrawerWidget extends StatelessWidget {
           ListTile(
             title: Text('My Prescriptions'),
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => Prescriptions(token: token)));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          Prescriptions(token: token)));
             },
           ),
           ListTile(
