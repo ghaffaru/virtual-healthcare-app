@@ -39,15 +39,15 @@ class DrawerWidget extends StatelessWidget {
                       builder: (BuildContext context) => Appointments(token)));
             },
           ),
-          ListTile(
-            title: Text('Request an ambulance'),
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (BuildContext context) => Login()));
-            },
-          ),
+//          ListTile(
+//            title: Text('Request an ambulance'),
+//            onTap: () {
+//              Navigator.push(
+//                  context,
+//                  MaterialPageRoute(
+//                      builder: (BuildContext context) => Login()));
+//            },
+//          ),
           ListTile(
             title: Text('My Prescriptions'),
             onTap: () {

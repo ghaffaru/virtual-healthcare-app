@@ -92,6 +92,27 @@ class _PrescriptionViewState extends State<PrescriptionView> {
       HttpHeaders.acceptHeader: 'application/json'
     });
 
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Confirm'),
+            content: Text(
+              'Please accept the transaction on your phone',
+              style: TextStyle(color: Colors.green),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Ok'),
+                onPressed: () => {
+                  Navigator.pop(context)
+                },
+              ),
+
+            ],
+          );
+        });
     print(response.statusCode);
     print(response.body);
   }

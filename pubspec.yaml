@@ -26,6 +26,8 @@ dependencies:
   datetime_picker_formfield: ^0.4.3
   http: ^0.12.0+2
   flutter_datetime_picker: ^1.2.8
+  keyboard_avoider: ^0.1.2
+  modal_progress_hud: ^0.1.3
 
 dev_dependencies:
   flutter_test:

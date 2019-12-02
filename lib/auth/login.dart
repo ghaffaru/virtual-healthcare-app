@@ -4,7 +4,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'accounts.dart';
 import 'package:v_healthcare/custom/constants.dart';
-
+import 'package:v_healthcare/components/rounded_button.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 class Login extends StatefulWidget {
   String message;
 
@@ -29,7 +30,12 @@ class _LoginState extends State<Login> {
   String error = '';
   String token;
 
+  bool showSpinner = false;
+
   void submitForm() async {
+    setState(() {
+      showSpinner = true;
+    });
     if (!formKey.currentState.validate()) {
       return;
     }
@@ -45,11 +51,14 @@ class _LoginState extends State<Login> {
 
     if (errorMessage['message'] == 'Authentication succeeded') {
       Navigator.of(context).pushReplacement(
-
         MaterialPageRoute(
           builder: (BuildContext context) => Account(token: token),
         ),
       );
+
+      setState(() {
+        showSpinner = false;
+      });
     }
   }
 
@@ -87,6 +96,7 @@ class _LoginState extends State<Login> {
     return {'success': !hasError, 'message': message};
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,84 +105,125 @@ class _LoginState extends State<Login> {
           child: Text('Patient'),
         ),
       ),
-      body: Container(
-        //        mainAxisAlignment: MainAxisAlignment.center,
-        margin: EdgeInsets.only(top: 20, left: 30, right: 30),
-        child: Column(
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Center(
-                  child: Text(widget.message != null ? widget.message : ""),
-                )
-              ],
-            ),
-            Form(
-              key: formKey,
-              child: Column(
+      body: ModalProgressHUD(
+        inAsyncCall: showSpinner,
+        child: Padding(
+          //        mainAxisAlignment: MainAxisAlignment.center,
+          padding: EdgeInsets.symmetric(horizontal: 24.0),
+
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Row(
                 children: <Widget>[
-                  TextFormField(
-                    decoration: InputDecoration(labelText: 'Email'),
-                    onSaved: (String value) {
-                      setState(() {
-                        email = value;
-                      });
-                    },
-                    validator: (String value) {
-                      if (value.isEmpty) {
-                        return 'The email field is required';
-                      }
-                    },
-                  ),
-                  SizedBox(height: 5),
-                  TextFormField(
-                    decoration: InputDecoration(labelText: 'Password'),
-                    obscureText: true,
-                    onSaved: (String value) {
-                      setState(() {
-                        password = value;
-                      });
-                    },
-                    validator: (String value) {
-                      if (value.isEmpty) {
-                        return 'The password field is required';
-                      }
-                    },
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(error),
-                  RaisedButton(
-                    child: Text('Login'),
-                    onPressed: submitForm,
-                  ),
+                  Center(
+                    child: Text(widget.message != null ? widget.message : ""),
+                  )
                 ],
               ),
-            ),
-            Row(
-              children: <Widget>[
-                SizedBox(
-                  width: 30,
-                ),
-                Text('Already have an account ?'),
-                SizedBox(
-                  width: 10,
-                ),
-                FlatButton(
-                  child: Text('Register'),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => Register(),
+              Form(
+                key: formKey,
+                child: Column(
+                  children: <Widget>[
+                    TextFormField(
+                      decoration: InputDecoration(
+                        hintText: 'Enter your email',
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 20.0),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(32.0)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Colors.lightBlueAccent, width: 1.0),
+                          borderRadius: BorderRadius.all(Radius.circular(32.0)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Colors.lightBlueAccent, width: 2.0),
+                          borderRadius: BorderRadius.all(Radius.circular(32.0)),
+                        ),
                       ),
-                    );
-                  },
-                )
-              ],
-            )
-          ],
+                      onSaved: (String value) {
+                        setState(() {
+                          email = value;
+                        });
+                      },
+                      validator: (String value) {
+                        if (value.isEmpty) {
+                          return 'The email field is required';
+                        }
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        hintText: 'Enter your password',
+                        contentPadding: EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 20.0),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(32.0)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Colors.lightBlueAccent, width: 1.0),
+                          borderRadius: BorderRadius.all(Radius.circular(32.0)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Colors.lightBlueAccent, width: 2.0),
+                          borderRadius: BorderRadius.all(Radius.circular(32.0)),
+                        ),
+                      ),
+                      obscureText: true,
+                      onSaved: (String value) {
+                        setState(() {
+                          password = value;
+                        });
+                      },
+                      validator: (String value) {
+                        if (value.isEmpty) {
+                          return 'The password field is required';
+                        }
+                      },
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Text(error),
+                    RoundedButton(
+                      title: 'Login',
+                      colour: Colors.blueAccent,
+                      onPressed: submitForm,
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                children: <Widget>[
+                  SizedBox(
+                    width: 30,
+                  ),
+                  Text('Already have an account ?'),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  FlatButton(
+                    child: Text('Register'),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => Register(),
+                        ),
+                      );
+                    },
+                  )
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
