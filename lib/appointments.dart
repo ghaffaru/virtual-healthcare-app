@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'dart:convert';
 import 'package:v_healthcare/Chat.dart';
+import 'package:v_healthcare/custom/constants.dart';
 class Appointments extends StatefulWidget {
   final String token;
 
@@ -21,7 +22,7 @@ class _AppointmentsState extends State<Appointments> {
     final idToken = widget.token;
 
     final http.Response response = await http
-        .get('http://10.0.2.2:8000/api/patient/appointments', headers: {
+        .get('$remoteUrl/api/patient/appointments', headers: {
       HttpHeaders.authorizationHeader: 'Bearer $idToken',
       HttpHeaders.contentTypeHeader: 'application/json',
       HttpHeaders.acceptHeader: 'application/json'
@@ -37,7 +38,7 @@ class _AppointmentsState extends State<Appointments> {
     final idToken = widget.token;
 
     final http.Response response = await http.delete(
-        'http://10.0.2.2:8000/api/patient/cancel-appointment/$id',
+        '$remoteUrl/api/patient/cancel-appointment/$id',
         headers: {
           HttpHeaders.authorizationHeader: 'Bearer $idToken',
           HttpHeaders.contentTypeHeader: 'application/json',

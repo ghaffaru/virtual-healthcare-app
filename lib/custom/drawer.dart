@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:v_healthcare/auth/login.dart';
+import 'package:v_healthcare/patient/login.dart';
 import 'package:v_healthcare/appointments.dart';
 import 'package:v_healthcare/doctors.dart';
 import 'package:v_healthcare/ambulance.dart';
@@ -61,10 +61,10 @@ class DrawerWidget extends StatelessWidget {
           ListTile(
             title: Text('Logout'),
             onTap: () {
-              Navigator.pushReplacement(
+              Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) => Login(),
+                  builder: (BuildContext context) => PatientLogin(),
                 ),
               );
 //

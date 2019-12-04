@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'dart:convert';
 import 'package:v_healthcare/view_prescription.dart';
-
+import 'package:v_healthcare/custom/constants.dart';
 class Prescriptions extends StatefulWidget {
   final String token;
 
@@ -20,7 +20,7 @@ class _PrescriptionsState extends State<Prescriptions> {
     final idToken = widget.token;
 
     final http.Response response = await http
-        .get('http://10.0.2.2:8000/api/patient/prescriptions', headers: {
+        .get('$remoteUrl/api/patient/prescriptions', headers: {
       HttpHeaders.authorizationHeader: 'Bearer $idToken',
       HttpHeaders.contentTypeHeader: 'application/json',
       HttpHeaders.acceptHeader: 'application/json'

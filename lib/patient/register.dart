@@ -5,6 +5,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'login.dart';
 import 'dart:io';
+import 'package:v_healthcare/custom/constants.dart';
+import 'package:v_healthcare/components/rounded_button.dart';
+
 class Register extends StatefulWidget {
   @override
   _RegisterState createState() => _RegisterState();
@@ -21,6 +24,8 @@ class _RegisterState extends State<Register> {
   String residence;
   String phone;
   String date_of_birth;
+
+  String selectedRegion;
 
   void submitForm() async {
     if (!formKey.currentState.validate()) return;
@@ -42,17 +47,22 @@ class _RegisterState extends State<Register> {
 
     print(json.encode(data));
     final http.Response response = await http.post(
-        'http://10.0.2.2:8000/api/patient/register',
-        body: json.encode(data),
-        headers: {HttpHeaders.acceptHeader : 'application/json',HttpHeaders.contentTypeHeader: 'application/json'},
-        );
+      '$remoteUrl/api/patient/register',
+      body: json.encode(data),
+      headers: {
+        HttpHeaders.acceptHeader: 'application/json',
+        HttpHeaders.contentTypeHeader: 'application/json'
+      },
+    );
 
     print(response.statusCode);
     print(response.body);
     Navigator.of(context).pushReplacement(
-
       MaterialPageRoute(
-        builder: (BuildContext context) => Login(message: 'You can now log in',),
+        builder: (BuildContext context) =>
+            PatientLogin(
+              message: 'You can now log in',
+            ),
       ),
     );
   }
@@ -97,6 +107,7 @@ class _RegisterState extends State<Register> {
                 SizedBox(
                   height: 5,
                 ),
+
                 TextFormField(
                   decoration: InputDecoration(labelText: 'Password'),
                   obscureText: true,
@@ -125,17 +136,62 @@ class _RegisterState extends State<Register> {
                 SizedBox(
                   height: 5,
                 ),
-                TextFormField(
-                  decoration: InputDecoration(labelText: 'Region'),
-                  validator: (String value) {
-                    if (value.isEmpty) return 'This field is required';
-                  },
-                  onSaved: (String value) {
-                    setState(() {
-                      region = value;
-                    });
-                  },
-                ),
+                DropdownButtonFormField(
+                    validator: (String value) {
+                      if (value == null) {
+                        return 'The region field is required';
+                      }
+                    },
+                    onChanged: (String value) {
+                      setState(() {
+                        selectedRegion = value;
+                      });
+                    },
+                    value: selectedRegion,
+                    hint: Text('Region'), items: [
+                  DropdownMenuItem(
+                    child: Text('Greater Accra'),
+                    value: 'Greater Accra',
+                  ),
+                  DropdownMenuItem(
+                    child: Text('Ashanti Region'),
+                    value: 'Ashanti Region',
+                  ),
+                  DropdownMenuItem(
+                    child: Text('Brong Ahafo Region'),
+                    value: 'Brong Ahafo Region',
+                  ),
+                  DropdownMenuItem(
+                    child: Text('Northern Region'),
+                    value: 'Northern Region',
+                  ),
+                  DropdownMenuItem(
+                    child: Text('Upper East Region'),
+                    value: 'Upper East Region',
+                  ),
+                  DropdownMenuItem(
+                    child: Text('Upper West Region'),
+                    value: 'Upper West Region',
+                  ),
+                  DropdownMenuItem(
+                    child: Text('Central Region'),
+                    value: 'Central Region',
+                  ),
+                  DropdownMenuItem(
+                    child: Text('Western Region'),
+                    value: 'Western Region',
+                  ),
+                  DropdownMenuItem(
+                    child: Text('Volta Region'),
+                    value: 'Volta Region',
+                  ),
+                  DropdownMenuItem(
+                    child: Text('Eastern Region'),
+                    value: 'Eastern Region',
+                  )
+                ]),
+
+
                 SizedBox(
                   height: 5,
                 ),
@@ -184,9 +240,8 @@ class _RegisterState extends State<Register> {
                         lastDate: DateTime(2100));
                   },
                   onSaved: (DateTime date) {
-                    final new_date= DateFormat('dd-MM-yyyy').format(date);
+                    final new_date = DateFormat('dd-MM-yyyy').format(date);
                     setState(() {
-
                       date_of_birth = new_date.toString();
                     });
                   },
@@ -194,8 +249,9 @@ class _RegisterState extends State<Register> {
                 SizedBox(
                   height: 5,
                 ),
-                RaisedButton(
-                  child: Text('Register'),
+                RoundedButton(
+                  title: 'Register',
+                  colour: Colors.lightBlueAccent,
                   onPressed: submitForm,
                 )
               ],
@@ -204,5 +260,3 @@ class _RegisterState extends State<Register> {
     );
   }
 }
-
-

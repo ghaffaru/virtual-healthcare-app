@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:v_healthcare/auth/login.dart';
+import 'package:v_healthcare/patient/login.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'appointments.dart';
@@ -7,6 +7,7 @@ import 'appointments.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'dart:io';
 import 'custom/drawer.dart';
+import 'package:v_healthcare/custom/constants.dart';
 
 class Doctors extends StatefulWidget {
   String token;
@@ -23,7 +24,7 @@ class _DoctorsState extends State<Doctors> {
 
   Future getDoctors() async {
     final http.Response response = await http
-        .get('http://10.0.2.2:8000/api/doctors', headers: {
+        .get('$remoteUrl/api/doctors', headers: {
       'Content-Type': 'application/json',
       'accept': 'application/json'
     });
@@ -41,7 +42,8 @@ class _DoctorsState extends State<Doctors> {
       'appointment_date': appointmentDate
     };
     final http.Response response =
-        await http.post('http://10.0.2.2:8000/api/patient/book-appointment',
+        await http.post('$remoteUrl/api/patient'
+            '/book-appointment',
             headers: {
               HttpHeaders.authorizationHeader: 'Bearer $idToken',
               'Content-Type': 'application/json',
@@ -98,18 +100,19 @@ class _DoctorsState extends State<Doctors> {
           itemCount: data == null ? 0 : data.length,
           itemBuilder: (BuildContext context, int index) {
             return Card(
+
               margin: EdgeInsets.all(10),
               color: Colors.blue[100],
               elevation: 4,
 //              height: 80,
 //              padding: EdgeInsets.all(5),
-              child: Row(
+              child: Column(
                 children: <Widget>[
-                  Text(
+                  Text('Dr. ' +
                     data[index]['name'],
-                    style: TextStyle(fontSize: 25),
+                    style: TextStyle(fontSize: 20),
                   ),
-                  Divider(),
+                  Divider(height: 5),
                   SizedBox(
                     width: 10,
                   ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:io';
-
+import 'package:v_healthcare/custom/constants.dart';
 class PrescriptionView extends StatefulWidget {
   final int prescriptionId;
   final String idToken;
@@ -21,7 +21,7 @@ class _PrescriptionViewState extends State<PrescriptionView> {
     final prescriptionId = widget.prescriptionId;
 
     final http.Response response = await http.get(
-        'http://10.0.2.2:8000/api/patient/prescription/$prescriptionId',
+        '$remoteUrl/api/patient/prescription/$prescriptionId',
         headers: {
           HttpHeaders.authorizationHeader: 'Bearer $idToken',
           HttpHeaders.contentTypeHeader: 'application/json',
@@ -66,7 +66,7 @@ class _PrescriptionViewState extends State<PrescriptionView> {
     final prescriptionId = widget.prescriptionId;
 
     final http.Response response = await http.put(
-        'http://10.0.2.2:8000/api/patient/prescription/$prescriptionId/submit',
+        '$remoteUrl/api/patient/prescription/$prescriptionId/submit',
         headers: {
           HttpHeaders.authorizationHeader: 'Bearer $idToken',
           HttpHeaders.contentTypeHeader: 'application/json',
@@ -85,7 +85,7 @@ class _PrescriptionViewState extends State<PrescriptionView> {
     final idToken = widget.idToken;
     final prescriptionId = widget.prescriptionId;
 
-    final http.Response response = await http.get('http://10.0.2.2:8000/api/patient/pay/$prescriptionId',
+    final http.Response response = await http.get('$remoteUrl/api/patient/pay/$prescriptionId',
     headers: {
       HttpHeaders.authorizationHeader: 'Bearer $idToken',
       HttpHeaders.contentTypeHeader: 'application/json',

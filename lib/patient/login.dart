@@ -6,16 +6,17 @@ import 'accounts.dart';
 import 'package:v_healthcare/custom/constants.dart';
 import 'package:v_healthcare/components/rounded_button.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-class Login extends StatefulWidget {
+
+class PatientLogin extends StatefulWidget {
   String message;
 
-  Login({this.message});
+  PatientLogin({this.message});
 
   @override
-  _LoginState createState() => _LoginState();
+  _PatientLoginState createState() => _PatientLoginState();
 }
 
-class _LoginState extends State<Login> {
+class _PatientLoginState extends State<PatientLogin> {
   @override
   void initState() {
 //     autoAuthenticate();
@@ -37,7 +38,11 @@ class _LoginState extends State<Login> {
       showSpinner = true;
     });
     if (!formKey.currentState.validate()) {
+      setState(() {
+        showSpinner = false;
+      });
       return;
+
     }
     formKey.currentState.save();
 
@@ -72,10 +77,8 @@ class _LoginState extends State<Login> {
       'provider': 'users'
     };
     print(json.encode(data));
-    final http.Response response = await http.post(
-        'http://10.0.2.2:8000/oauth/token',
-        body: json.encode(data),
-        headers: {'Content-Type': 'application/json'});
+    final http.Response response = await http.post('$remoteUrl/oauth/token',
+        body: json.encode(data), headers: {'Content-Type': 'application/json'});
 
     final Map<String, dynamic> responseData = json.decode(response.body);
     print(responseData);
@@ -92,16 +95,19 @@ class _LoginState extends State<Login> {
       });
     } else if (responseData['error'] == 'invalid_credentials') {
       message = 'Invalid credentials';
+      setState(() {
+        showSpinner = false;
+      });
     }
     return {'success': !hasError, 'message': message};
   }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Center(
+          widthFactor: 4,
           child: Text('Patient'),
         ),
       ),
@@ -154,6 +160,7 @@ class _LoginState extends State<Login> {
                         if (value.isEmpty) {
                           return 'The email field is required';
                         }
+
                       },
                     ),
                     SizedBox(height: 20),
@@ -191,10 +198,10 @@ class _LoginState extends State<Login> {
                     SizedBox(
                       height: 5,
                     ),
-                    Text(error),
+                    Text(error, style: TextStyle(color: Colors.red),),
                     RoundedButton(
                       title: 'Login',
-                      colour: Colors.blueAccent,
+                      colour: Colors.lightBlueAccent,
                       onPressed: submitForm,
                     ),
                   ],
@@ -203,13 +210,14 @@ class _LoginState extends State<Login> {
               Row(
                 children: <Widget>[
                   SizedBox(
-                    width: 30,
+                    width: 8,
                   ),
                   Text('Already have an account ?'),
                   SizedBox(
                     width: 10,
                   ),
                   FlatButton(
+
                     child: Text('Register'),
                     onPressed: () {
                       Navigator.push(
@@ -219,13 +227,14 @@ class _LoginState extends State<Login> {
                         ),
                       );
                     },
-                  )
+                  ),
                 ],
               )
             ],
           ),
         ),
       ),
+      bottomNavigationBar: FlatButton(onPressed: null, child: Text('Forgot Password ?')),
     );
   }
 }
