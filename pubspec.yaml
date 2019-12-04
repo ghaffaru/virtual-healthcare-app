@@ -29,6 +29,8 @@ dependencies:
   keyboard_avoider: ^0.1.2
   modal_progress_hud: ^0.1.3
   pusher_websocket_flutter: ^0.1.1
+  shared_preferences: ^0.5.4+8
+  email_validator: ^1.0.0
 
 dev_dependencies:
   flutter_test:

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'patient/login.dart';
+import 'package:v_healthcare/patient/register.dart';
 import 'home.dart';
 //import 'package:map_view/map_view.dart';
+import 'package:v_healthcare/doctor/login.dart';
 
 void main() async {
 
@@ -19,8 +21,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(fontFamily: 'Raleway', primaryColor: Colors.lightBlueAccent),
       routes: {
         '/' : (context)  => Home(),
-        '/patient-login' : (context) => PatientLogin()
+        '/patient-login' : (context) => PatientLogin(),
+        '/patient-register': (context) => PatientRegister(),
+        '/doctor-login' : (context) => DoctorLogin(),
       },
+//        onGenerateRoute: router.generateRoute,
+//        initialRoute: router.HomeViewRoute,
+//        home: Home(),
+
     );
   }
 }

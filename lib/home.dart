@@ -23,6 +23,7 @@ class Home extends StatelessWidget {
                 color: Colors.lightBlueAccent,
                 borderRadius: BorderRadius.circular(20.0),
                 child: MaterialButton(
+                  onPressed: () => Navigator.pushNamed(context, '/doctor-login'),
                   minWidth: 300.0,
                   height: 42.0,
                   child: Text(

@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
-import 'register.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'accounts.dart';
 import 'package:v_healthcare/custom/constants.dart';
 import 'package:v_healthcare/components/rounded_button.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'dart:io';
-
-class PatientLogin extends StatefulWidget {
+import 'account.dart';
+class DoctorLogin extends StatefulWidget {
   String message;
   bool leading = true;
 
-  PatientLogin({this.message, this.leading});
+  DoctorLogin({this.message, this.leading});
 
   @override
-  _PatientLoginState createState() => _PatientLoginState();
+  _DoctorLoginState createState() => _DoctorLoginState();
 }
 
-class _PatientLoginState extends State<PatientLogin> {
+class _DoctorLoginState extends State<DoctorLogin> {
   @override
   void initState() {
 //     autoAuthenticate();
@@ -88,7 +86,7 @@ class _PatientLoginState extends State<PatientLogin> {
       'client_secret': '$clientSecret',
       'username': '$email',
       'password': '$password',
-      'provider': 'users'
+      'provider': 'doctors'
     };
     print(json.encode(data));
     final http.Response response = await http.post('$remoteUrl/oauth/token',
@@ -123,10 +121,11 @@ class _PatientLoginState extends State<PatientLogin> {
 //        automaticallyImplyLeading: false,
         title: Center(
           widthFactor: 4,
-          child: Text('Patient'),
+          child: Text('Doctor'),
         ),
       ),
       body: ModalProgressHUD(
+
         inAsyncCall: showSpinner,
         child: Padding(
           //        mainAxisAlignment: MainAxisAlignment.center,
@@ -138,6 +137,7 @@ class _PatientLoginState extends State<PatientLogin> {
             children: <Widget>[
               Column(
                 children: <Widget>[
+//                  CircleAvatar(child: Image.network('https://cdn2.vectorstock.com/i/1000x1000/36/61/doctor-logo-icon-design-vector-15613661.jpg', height: 200,),),
                   Center(
                     child: Text(
                       widget.message != null ? widget.message : "",
@@ -231,28 +231,13 @@ class _PatientLoginState extends State<PatientLogin> {
                   ],
                 ),
               ),
-              Row(
-                children: <Widget>[
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text('Dont have an account ?'),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  FlatButton(
-                      child: Text('Register'),
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/patient-register');
-                      })
-                ],
-              )
+
             ],
           ),
         ),
       ),
       bottomNavigationBar:
-          FlatButton(onPressed: null, child: Text('Forgot Password ?')),
+      FlatButton(onPressed: null, child: Text('Forgot Password ?')),
     );
   }
 }
