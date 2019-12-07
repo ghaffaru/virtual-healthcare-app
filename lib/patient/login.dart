@@ -7,7 +7,7 @@ import 'package:v_healthcare/custom/constants.dart';
 import 'package:v_healthcare/components/rounded_button.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'dart:io';
-
+import 'package:shared_preferences/shared_preferences.dart';
 class PatientLogin extends StatefulWidget {
   String message;
   bool leading = true;
@@ -59,7 +59,7 @@ class _PatientLoginState extends State<PatientLogin> {
     if (errorMessage['message'] == 'Authentication succeeded') {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (BuildContext context) => Account(token: token),
+          builder: (BuildContext context) => Account(),
         ),
       );
 
@@ -101,9 +101,9 @@ class _PatientLoginState extends State<PatientLogin> {
     if (responseData.containsKey('access_token')) {
       hasError = false;
       message = 'Authentication succeeded';
-//      final SharedPreferences prefs = await SharedPreferences.getInstance();
-//      prefs.setString('token', responseData['access_token']);
-
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString('token', responseData['access_token']);
+//      prefs.setString('id', value)
       setState(() {
         token = responseData['access_token'];
       });

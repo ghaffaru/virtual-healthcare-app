@@ -5,11 +5,16 @@ import 'dart:convert';
 import 'package:keyboard_avoider/keyboard_avoider.dart';
 import 'package:v_healthcare/pusher_service_initial.dart';
 import 'package:v_healthcare/custom/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'custom/constants.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+final _firestore = Firestore.instance;
+
 class Chat extends StatefulWidget {
-  final idToken;
   final doctorId;
 
-  Chat({this.idToken, this.doctorId});
+  Chat(this.doctorId);
 
   @override
   _ChatState createState() => _ChatState();
@@ -18,121 +23,44 @@ class Chat extends StatefulWidget {
 class _ChatState extends State<Chat> {
   final messageTextController = TextEditingController();
   String messageText;
-  List conversation;
-  Stream conversation2;
-  int userId;
-  FocusNode _focusNode = FocusNode();
-  AnimationController _controller;
+  String userId;
 
-  PusherService pusherService = PusherService();
-
-  final ScrollController _scrollController = ScrollController();
-
-  Future getUser() async {
-    final idToken = widget.idToken;
-    final doctorId = widget.doctorId;
-
-    final http.Response response =
-        await http.get('$remoteUrl/api/user', headers: {
-      HttpHeaders.authorizationHeader: 'Bearer $idToken',
-      HttpHeaders.acceptHeader: 'application/json',
-      HttpHeaders.contentTypeHeader: 'application/json'
-    });
-
-    setState(() {
-      userId = jsonDecode(response.body)['id'];
-    });
-    return jsonDecode(response.body)['email'];
-    print('User id $userId');
+  Future setDoctorId() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    print(widget.doctorId);
+    prefs.setString('doctor_id', widget.doctorId.toString());
   }
 
-  Future sendMessage() async {
-    final idToken = widget.idToken;
-    final doctorId = widget.doctorId;
-
-    Map<String, dynamic> data = {
-      'message': messageText,
-      'id': doctorId,
-      'owner': 'patient'
-    };
-
-    final http.Response response =
-        await http.post('$remoteUrl/api/patient/doctor/message',
-            headers: {
-              HttpHeaders.authorizationHeader: 'Bearer $idToken',
-              HttpHeaders.acceptHeader: 'application/json',
-              HttpHeaders.contentTypeHeader: 'application/json'
-            },
-            body: jsonEncode(data));
-
-    print(jsonEncode(data));
-    print(response.statusCode);
-    print(response.body);
+  Future getUserId() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userId = prefs.getString('id');
+    });
+//      return prefs.getString('id');
   }
 
-  // ignore: missing_return
-  Future<Stream> displayMyMessages() async {
-    final idToken = widget.idToken;
-    final doctorId = widget.doctorId;
-
-    final http.Response response = await http
-        .get('$remoteUrl/api/patient/doctor/message', headers: {
-      HttpHeaders.authorizationHeader: 'Bearer $idToken',
-      HttpHeaders.acceptHeader: 'application/json',
-      HttpHeaders.contentTypeHeader: 'application/json'
-    });
-
-    print(response.statusCode);
-    print(jsonDecode(response.body)['data'][0]);
-    final int conversationId =
-        jsonDecode(response.body)['data'][0]['conversation_id'];
-    print(conversationId);
-    final http.Response response2 = await http
-        .get('$remoteUrl/api/$conversationId/conversation', headers: {
-      HttpHeaders.authorizationHeader: 'Bearer $idToken',
-      HttpHeaders.acceptHeader: 'application/json',
-      HttpHeaders.contentTypeHeader: 'application/json'
-    });
-    print(jsonDecode(response2.body)['data']);
-
-    setState(() {
-      conversation = jsonDecode(response2.body)['data'];
-    });
-    await for (var snapshot in conversation2) {
-      for (var message in snapshot.message) {
-        print(message);
+  void messagesStream() async {
+    await for (var snapshot in _firestore.collection('messages').snapshots()) {
+      for (var message in snapshot.documents) {
+        print(message.data);
       }
     }
-//    print(conversation[0]['message']);
   }
 
   @override
   void initState() {
-    pusherService = PusherService();
-    pusherService.firePusher('chat', 'message');
-    getUser();
-    displayMyMessages();
-    _focusNode.addListener(() {
-      if (_focusNode.hasFocus) {
-        _controller.forward();
-      } else {
-        _controller.reverse();
-      }
-    });
-    super.initState();
+    getUserId();
+    setDoctorId();
   }
 
   @override
   void didUpdateWidget(Chat oldWidget) {
-    displayMyMessages();
+//    displayMyMessages();
     super.didUpdateWidget(oldWidget);
   }
 
   @override
   void dispose() {
-    pusherService.unbindEvent('message');
-    _controller.dispose();
-    _focusNode.dispose();
     super.dispose();
   }
 
@@ -147,150 +75,136 @@ class _ChatState extends State<Chat> {
                 icon: Icon(Icons.close),
                 onPressed: () {
                   //Implement logout functionality
-                  displayMyMessages();
-//                _auth.signOut();
-//                Navigator.pop(context);
                 }),
           ],
           title: Text('⚡️Chat'),
           backgroundColor: Colors.lightBlueAccent,
         ),
-        body: Container(
-//          child: StreamBuilder(
-//            stream: pusherService.eventStream,
-//            builder: (BuildContext context, AsyncSnapshot snapshot) {
-//              if (!snapshot.hasData) {
-//                return CircularProgressIndicator();
-//              }
-//              final Map<dynamic, dynamic> messages = jsonDecode(snapshot.data);
-////              return Container(child: Text(messages.);
-//              List<MessageBubble> messageBubbles = [];
-//
-//              for (var message in messages['message']) {
-//                final messageText = message.data['message'];
-//                final messageSender = message.data['sender_id'];
-//                final currentUser = getUser();
-//
-//
-//
-//                final messageBubble =
-//                MessageBubble(sender: messageSender,
-//                  text: messageText,
-//                  isMe: currentUser == messageSender,);
-//
-//                messageBubbles.add(messageBubble);
-//              }
-//              return Expanded(
-//                child: ListView(
-//                  padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
-//                  children: messageBubbles,
-//                  reverse: true,
-//                ),
-//              );
-//            },
-//          ),
-          child: KeyboardAvoider(
-            autoScroll: true,
-            child: ListView.builder(
-                    controller: ScrollController(),
-                    shrinkWrap: true,
-                    itemCount: conversation == null ? 0 : conversation.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: Column(
-                          crossAxisAlignment: conversation[index]['owner'] == 'patient'
-                              ? CrossAxisAlignment.end
-                              : CrossAxisAlignment.start,
-                          children: <Widget>[
-//                    Text(sender),
-                            Material(
-                              elevation: 5.0,
-                              borderRadius: conversation[index]['owner'] == 'patient'
-                                  ? BorderRadius.only(
-                                      topLeft: Radius.circular(30),
-                                      bottomLeft: Radius.circular(30),
-                                      bottomRight: Radius.circular(30))
-                                  : BorderRadius.only(
-                                      topRight: Radius.circular(30),
-                                      bottomLeft: Radius.circular(30),
-                                      bottomRight: Radius.circular(30)),
-                              color: conversation[index]['owner'] == 'patient'
-                                  ? Colors.lightBlueAccent
-                                  : Colors.white,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 20, vertical: 10),
-                                child: Text(
-                                  conversation[index]['message'],
-                                  style: TextStyle(
-                                      fontSize: 15.0,
-                                      color: conversation[index]['owner'] == 'patient'
-                                          ? Colors.white
-                                          : Colors.black),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }),
-          ),
+        body: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              MessagesStream(),
+              Container(
+                decoration: kMessageContainerDecoration,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Expanded(
+                      child: TextField(
+                        controller: messageTextController,
+                        onChanged: (value) {
+                          //Do something with the user input.
+                          messageText = value;
+                        },
+                        decoration: kMessageTextFieldDecoration,
+                      ),
+                    ),
+                    FlatButton(
+                      onPressed: () async {
+                        //Implement send functionality.
+                        messageTextController.clear();
+                        final SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
 
-      ),
-
-      bottomNavigationBar: Container(
-
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(color: Colors.lightBlueAccent, width: 2.0),
-          ),
-        ),
-        child: Row(
-
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Expanded(
-              child: TextField(
-                scrollController: ScrollController(),
-                controller: messageTextController,
-                focusNode: _focusNode,
-                onChanged: (value) {
-                  //Do something with the user input.
-                  messageText = value;
-                },
-                decoration: InputDecoration(
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-                  hintText: 'Type your message here...',
-                  border: InputBorder.none,
+                        String userId = prefs.getString('id');
+                        _firestore.collection("messages").add({
+                          'user_id': userId.toString(),
+                          'doctor_id': widget.doctorId.toString(),
+                          'message': messageText,
+                          'sender': 'patient'
+                        });
+                      },
+                      child: Text(
+                        'Send',
+                        style: kSendButtonTextStyle,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-            FlatButton(
-              onPressed: () {
-                //Implement send functionality.
-                messageTextController.clear();
-                sendMessage();
-                displayMyMessages();
-              },
-              child: Text(
-                'Send',
-                style: TextStyle(
-                  color: Colors.lightBlueAccent,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18.0,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+            ],
+          ),
+        ));
+  }
+}
+
+class MessagesStream extends StatefulWidget {
+  @override
+  _MessagesStreamState createState() => _MessagesStreamState();
+}
+
+class _MessagesStreamState extends State<MessagesStream> {
+  String userId;
+  String doctorId;
+
+  Future getUserId() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userId = prefs.getString('id');
+    });
+
+//      return prefs.getString('id');
+  }
+
+  Future getDoctorId() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      doctorId = prefs.getString('doctor_id');
+    });
+  }
+
+  @override
+  void initState() {
+    getDoctorId();
+    getUserId();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: _firestore.collection("messages").snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return Center(child: Text(''));
+        }
+        final messages = snapshot.data.documents.reversed;
+        List<MessageBubble> messageBubbles = [];
+
+        for (var message in messages) {
+          final messageText = message.data['message'];
+          final messageSender = message.data['user_id'];
+          final messageReceiver = message.data['doctor_id'];
+          final currentUser = userId;
+
+          final messageBubble = MessageBubble(
+            sender: messageSender,
+            text: messageText,
+            isMe: message.data['sender'] == 'patient',
+          );
+//          print(messageSender);
+          print(doctorId);
+          if ((messageSender == currentUser) && (messageReceiver == doctorId)) {
+            messageBubbles.add(messageBubble);
+          }
+        }
+
+        return Expanded(
+          child: ListView(
+            padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+            children: messageBubbles,
+            reverse: true,
+          ),
         );
+      },
+    );
   }
 }
 
 class MessageBubble extends StatelessWidget {
+
   final String sender;
   final String text;
   final bool isMe;
@@ -302,28 +216,28 @@ class MessageBubble extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.all(10.0),
       child: Column(
-        crossAxisAlignment: isMe ?  CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment:
+            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: <Widget>[
-          Text(sender),
+//          Text(sender),
           Material(
             elevation: 5.0,
-            borderRadius: isMe ? BorderRadius.only(
-                topLeft: Radius.circular(30),
-                bottomLeft: Radius.circular(30),
-                bottomRight: Radius.circular(30)) :
-
-            BorderRadius.only(
-                topRight: Radius.circular(30),
-                bottomLeft: Radius.circular(30),
-                bottomRight: Radius.circular(30)
-            ),
-            color: isMe ?  Colors.lightBlueAccent : Colors.white,
+            borderRadius: isMe
+                ? BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    bottomLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30))
+                : BorderRadius.only(
+                    topRight: Radius.circular(30),
+                    bottomLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30)),
+            color: isMe ? Colors.lightBlueAccent : Colors.white,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Text(
                 '$text',
-                style: TextStyle(fontSize: 15.0,
-                    color: isMe ? Colors.white : Colors.black),
+                style: TextStyle(
+                    fontSize: 15.0, color: isMe ? Colors.white : Colors.black),
               ),
             ),
           ),

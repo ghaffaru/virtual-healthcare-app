@@ -5,6 +5,8 @@ import 'package:v_healthcare/doctors.dart';
 import 'package:v_healthcare/home.dart';
 import 'package:v_healthcare/prescriptions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'chats.dart';
+import 'prescribe.dart';
 
 class DrawerWidget extends StatelessWidget {
   final String token;
@@ -21,23 +23,23 @@ class DrawerWidget extends StatelessWidget {
             automaticallyImplyLeading: false,
           ),
           ListTile(
-            title: Text('Consult a doctor'),
+            title: Text('Chats'),
             onTap: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (BuildContext context) => Doctors(
-                            token: token,
-                          )));
+                      builder: (BuildContext context) => Chats(
+                      )));
             },
           ),
           ListTile(
-            title: Text('My Appointments'),
+            title: Text('Make Prescription'),
             onTap: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (BuildContext context) => Appointments(token)));
+                      builder: (BuildContext context) => Prescribe(
+                      )));
             },
           ),
 //          ListTile(
@@ -49,16 +51,7 @@ class DrawerWidget extends StatelessWidget {
 //                      builder: (BuildContext context) => Login()));
 //            },
 //          ),
-          ListTile(
-            title: Text('My Prescriptions'),
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          Prescriptions(token: token)));
-            },
-          ),
+
           ListTile(
             title: Text('Logout'),
             onTap: () async {

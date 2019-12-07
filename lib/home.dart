@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:v_healthcare/patient/accounts.dart';
 class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -23,7 +24,8 @@ class Home extends StatelessWidget {
                 color: Colors.lightBlueAccent,
                 borderRadius: BorderRadius.circular(20.0),
                 child: MaterialButton(
-                  onPressed: () => Navigator.pushNamed(context, '/doctor-login'),
+                  onPressed: () =>
+                      Navigator.pushNamed(context, '/doctor-login'),
                   minWidth: 300.0,
                   height: 42.0,
                   child: Text(
@@ -42,7 +44,19 @@ class Home extends StatelessWidget {
                 color: Colors.lightBlueAccent,
                 borderRadius: BorderRadius.circular(20.0),
                 child: MaterialButton(
-                  onPressed: () => Navigator.pushNamed(context, '/patient-login'),
+                  onPressed: () async {
+                    final SharedPreferences prefs = await SharedPreferences
+                        .getInstance();
+                    String token = prefs.getString('token');
+                    if (token == null) {
+                      Navigator
+                          .pushNamed(context, '/patient-login');
+                    } else {
+                      Navigator.pushReplacement(context, MaterialPageRoute(
+                        builder: (BuildContext context) => Account(),
+                      ),);
+                    }
+                  },
                   minWidth: 300.0,
                   height: 42.0,
                   child: Text(

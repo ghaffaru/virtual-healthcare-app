@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:pusher_websocket_flutter/pusher.dart';
 
-
 class PusherService {
   Event lastEvent;
   String lastConnectionState;

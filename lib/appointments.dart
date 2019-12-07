@@ -147,12 +147,8 @@ class _AppointmentsState extends State<Appointments> {
                                     ? ""
                                     : "Chat"),
                                 onPressed: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              Chat(idToken: widget.token, doctorId: data[index]['doctor_id'],)));
-                                },
+
+                                }
                               )
                             ],
                           ),
