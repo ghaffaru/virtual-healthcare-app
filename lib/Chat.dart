@@ -135,7 +135,8 @@ class _ChatState extends State<Chat> {
                           'user_id': userId.toString(),
                           'doctor_id': widget.doctorId.toString(),
                           'message': messageText,
-                          'sender': 'patient'
+                          'sender': 'patient',
+                          'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
                         });
 
                         sendMessage();
@@ -189,12 +190,12 @@ class _MessagesStreamState extends State<MessagesStream> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: _firestore.collection("messages").snapshots(),
+      stream: _firestore.collection("messages").orderBy('timestamp', descending: true).snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Center(child: Text(''));
         }
-        final messages = snapshot.data.documents.reversed;
+        final messages = snapshot.data.documents;
         List<MessageBubble> messageBubbles = [];
 
         for (var message in messages) {

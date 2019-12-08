@@ -23,18 +23,18 @@ class Chat extends StatefulWidget {
 class _ChatState extends State<Chat> {
   final messageTextController = TextEditingController();
   String messageText;
-  String userId;
+  String doctorId;
 
-  Future setDoctorId() async {
+  Future setUserId() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    print(widget.doctorId);
-    prefs.setString('doctor_id', widget.doctorId.toString());
+    print(widget.userId);
+    prefs.setString('user_id', widget.userId.toString());
   }
 
   Future getUserId() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      userId = prefs.getString('id');
+      doctorId = prefs.getString('doctor_id');
     });
 //      return prefs.getString('id');
   }
@@ -50,15 +50,15 @@ class _ChatState extends State<Chat> {
   Future sendMessage() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String idToken = prefs.getString('token');
-    String doctorId = prefs.getString('doctor_id');
+    String userId = prefs.getString('user_id');
 
     final Map<String, dynamic> data = {
-      'doctor_id': '$doctorId',
+      'user_id': '$userId',
       'message': '$messageText',
-      'sender': 'patient',
+      'sender': 'doctor',
     };
     final http.Response response =
-    await http.post('$remoteUrl/api/patient/doctor/message',
+    await http.post('$remoteUrl/api/doctor/patient/chat',
         headers: {
           HttpHeaders.authorizationHeader: 'Bearer $idToken',
           HttpHeaders.contentTypeHeader: 'application/json',
@@ -72,7 +72,7 @@ class _ChatState extends State<Chat> {
   @override
   void initState() {
     getUserId();
-    setDoctorId();
+    setUserId();
   }
 
   @override
@@ -130,12 +130,13 @@ class _ChatState extends State<Chat> {
                         final SharedPreferences prefs =
                         await SharedPreferences.getInstance();
 
-                        String userId = prefs.getString('id');
+                        String doctorId = prefs.getString('doctor_id');
                         _firestore.collection("messages").add({
-                          'user_id': userId.toString(),
-                          'doctor_id': widget.doctorId.toString(),
+                          'user_id': widget.userId.toString(),
+                          'doctor_id': doctorId.toString(),
                           'message': messageText,
-                          'sender': 'patient'
+                          'sender': 'doctor',
+                          'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
                         });
 
                         sendMessage();
@@ -166,7 +167,7 @@ class _MessagesStreamState extends State<MessagesStream> {
   Future getUserId() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      userId = prefs.getString('id');
+      userId = prefs.getString('user_id');
     });
 
 //      return prefs.getString('id');
@@ -189,19 +190,19 @@ class _MessagesStreamState extends State<MessagesStream> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: _firestore.collection("messages").snapshots(),
+      stream: _firestore.collection("messages").orderBy('timestamp', descending: true).snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Center(child: Text(''));
         }
-        final messages = snapshot.data.documents.reversed;
+        final messages = snapshot.data.documents;
         List<MessageBubble> messageBubbles = [];
 
         for (var message in messages) {
           final messageText = message.data['message'];
           final messageSender = message.data['doctor_id'];
           final messageReceiver = message.data['user_id'];
-          final currentUser = userId;
+          final currentUser = doctorId;
 
           final messageBubble = MessageBubble(
             sender: messageSender,
@@ -209,8 +210,8 @@ class _MessagesStreamState extends State<MessagesStream> {
             isMe: message.data['sender'] == 'doctor',
           );
 //          print(messageSender);
-          print(doctorId);
-          if ((messageSender == currentUser) && (messageReceiver == doctorId)) {
+          print(userId);
+          if ((messageSender == currentUser) && (messageReceiver == userId)) {
             messageBubbles.add(messageBubble);
           }
         }

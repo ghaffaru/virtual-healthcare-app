@@ -41,44 +41,44 @@ class _ChatsState extends State<Chats> {
     print(patients);
   }
 
-  void messagesStream() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    String doctorId = prefs.getString('doctor_id');
-    print(doctorId);
-    await for (var snapshot in _firestore.collection('messages').snapshots()) {
-      for (var message in snapshot.documents) {
-        if (message.data['doctor_id'] == doctorId) print(message.data);
-        userIds.add(int.parse(message.data['user_id']));
-      }
-
-      userIds = userIds.toSet().toList();
-      print(userIds);
-
-      for (int i = 0; i < userIds.length; i++) {
-        int id = userIds[i];
-
-        final http.Response response =
-            await http.get('$remoteUrl/api/getPatient/$id', headers: {
-          HttpHeaders.contentTypeHeader: 'application/json',
-          HttpHeaders.acceptHeader: 'application/json'
-        });
-//        patients.addAll(json.decode(response.body));
-        setState(() {
-          user = json.decode(response.body);
-        });
-        patients.add(user);
-
-//        print(users);
-//        print(json.decode(response.body));
-//        print(patients);
-//        print(users);
-
-      }
-//      print(patients);
-//      patients = users;
-      print(user);
-    }
-  }
+//  void messagesStream() async {
+//    final SharedPreferences prefs = await SharedPreferences.getInstance();
+//    String doctorId = prefs.getString('doctor_id');
+//    print(doctorId);
+//    await for (var snapshot in _firestore.collection('messages').snapshots()) {
+//      for (var message in snapshot.documents) {
+//        if (message.data['doctor_id'] == doctorId) print(message.data);
+//        userIds.add(int.parse(message.data['user_id']));
+//      }
+//
+//      userIds = userIds.toSet().toList();
+//      print(userIds);
+//
+//      for (int i = 0; i < userIds.length; i++) {
+//        int id = userIds[i];
+//
+//        final http.Response response =
+//            await http.get('$remoteUrl/api/getPatient/$id', headers: {
+//          HttpHeaders.contentTypeHeader: 'application/json',
+//          HttpHeaders.acceptHeader: 'application/json'
+//        });
+////        patients.addAll(json.decode(response.body));
+//        setState(() {
+//          user = json.decode(response.body);
+//        });
+//        patients.add(user);
+//
+////        print(users);
+////        print(json.decode(response.body));
+////        print(patients);
+////        print(users);
+//
+//      }
+////      print(patients);
+////      patients = users;
+//      print(user);
+//    }
+//  }
 
   @override
   void initState() {
@@ -86,6 +86,13 @@ class _ChatsState extends State<Chats> {
     getPatients();
     super.initState();
   }
+
+  @override
+  void didUpdateWidget(Chats oldWidget) {
+    getPatients();
+    super.didUpdateWidget(oldWidget);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -96,6 +103,8 @@ class _ChatsState extends State<Chats> {
       drawer: DrawerWidget(),
       body: patients != null
           ? ListView.builder(
+//              reverse: true,
+
               itemCount: patients == null ? 0 : patients.length,
               itemBuilder: (BuildContext context, int index) {
                 return GestureDetector(
