@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'dart:convert';
-import 'package:v_healthcare/view_prescription.dart';
+import 'package:v_healthcare/patient/view_prescription.dart';
 import 'package:v_healthcare/custom/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 class Prescriptions extends StatefulWidget {
   final String token;
-
   Prescriptions({this.token});
 
   @override
@@ -17,10 +18,11 @@ class _PrescriptionsState extends State<Prescriptions> {
   List data;
 
   Future getMyPrescriptions() async {
-    final idToken = widget.token;
-
-    final http.Response response = await http
-        .get('$remoteUrl/api/patient/prescriptions', headers: {
+//    final idToken = widget.token;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final idToken = prefs.getString('token');
+    final http.Response response =
+        await http.get('$remoteUrl/api/patient/prescriptions', headers: {
       HttpHeaders.authorizationHeader: 'Bearer $idToken',
       HttpHeaders.contentTypeHeader: 'application/json',
       HttpHeaders.acceptHeader: 'application/json'
@@ -54,9 +56,10 @@ class _PrescriptionsState extends State<Prescriptions> {
                 itemCount: data == null ? 0 : data.length,
                 itemBuilder: (BuildContext context, int index) {
                   return Card(
-                    color: Colors.blue[100],
+//                    color: Colors.blue[100],
+                    color: Colors.white,
                     margin: EdgeInsets.all(20),
-                    elevation: 4,
+                    elevation: 1,
                     child: Column(
                       children: <Widget>[
                         SizedBox(
@@ -70,18 +73,24 @@ class _PrescriptionsState extends State<Prescriptions> {
                           height: 10,
                         ),
                         Text('Prescription Date: ' +
-                            (data[index]['created_at'])),
+                            ((data[index]['created_at']))),
                         SizedBox(
                           height: 10,
                         ),
                         FlatButton(
-                          child: Text('view'),
+                          child: Text(
+                            'view',
+                            style: TextStyle(color: Colors.lightBlueAccent),
+                          ),
                           onPressed: () {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (BuildContext context) =>
-                                        PrescriptionView(idToken: widget.token, prescriptionId: data[index]['id'],)));
+                                        PrescriptionView(
+                                          idToken: widget.token,
+                                          prescriptionId: data[index]['id'],
+                                        )));
                           },
                         )
                       ],

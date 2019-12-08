@@ -69,6 +69,9 @@ class _DoctorLoginState extends State<DoctorLogin> {
     }
   }
 
+  Future getUser() async {
+
+  }
   Future<Map<String, dynamic>> login() async {
 //    try {
 //      final result = await InternetAddress.lookup('google.com');

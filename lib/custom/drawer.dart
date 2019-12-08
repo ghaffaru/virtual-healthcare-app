@@ -3,7 +3,7 @@ import 'package:v_healthcare/patient/login.dart';
 import 'package:v_healthcare/appointments.dart';
 import 'package:v_healthcare/doctors.dart';
 import 'package:v_healthcare/home.dart';
-import 'package:v_healthcare/prescriptions.dart';
+import 'package:v_healthcare/patient/prescriptions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DrawerWidget extends StatelessWidget {

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'package:v_healthcare/custom/constants.dart';
+
 class PrescriptionView extends StatefulWidget {
   final int prescriptionId;
   final String idToken;
@@ -20,13 +21,12 @@ class _PrescriptionViewState extends State<PrescriptionView> {
     final idToken = widget.idToken;
     final prescriptionId = widget.prescriptionId;
 
-    final http.Response response = await http.get(
-        '$remoteUrl/api/patient/prescription/$prescriptionId',
-        headers: {
-          HttpHeaders.authorizationHeader: 'Bearer $idToken',
-          HttpHeaders.contentTypeHeader: 'application/json',
-          HttpHeaders.acceptHeader: 'application/json'
-        });
+    final http.Response response = await http
+        .get('$remoteUrl/api/patient/prescription/$prescriptionId', headers: {
+      HttpHeaders.authorizationHeader: 'Bearer $idToken',
+      HttpHeaders.contentTypeHeader: 'application/json',
+      HttpHeaders.acceptHeader: 'application/json'
+    });
 
     setState(() {
       data = jsonDecode(response.body)['data'];
@@ -85,13 +85,12 @@ class _PrescriptionViewState extends State<PrescriptionView> {
     final idToken = widget.idToken;
     final prescriptionId = widget.prescriptionId;
 
-    final http.Response response = await http.get('$remoteUrl/api/patient/pay/$prescriptionId',
-    headers: {
+    final http.Response response =
+        await http.get('$remoteUrl/api/patient/pay/$prescriptionId', headers: {
       HttpHeaders.authorizationHeader: 'Bearer $idToken',
       HttpHeaders.contentTypeHeader: 'application/json',
       HttpHeaders.acceptHeader: 'application/json'
     });
-
 
     showDialog(
         context: context,
@@ -105,11 +104,8 @@ class _PrescriptionViewState extends State<PrescriptionView> {
             actions: <Widget>[
               FlatButton(
                 child: Text('Ok'),
-                onPressed: () => {
-                  Navigator.pop(context)
-                },
+                onPressed: () => {Navigator.pop(context)},
               ),
-
             ],
           );
         });
@@ -136,74 +132,146 @@ class _PrescriptionViewState extends State<PrescriptionView> {
         title: Text('Prescription detail'),
       ),
       body: Container(
-        decoration: BoxDecoration(color: Colors.grey[300]),
+        decoration: BoxDecoration(),
         child: ListView(
           padding: EdgeInsets.all(10),
           children: <Widget>[
             SizedBox(
               height: 10,
             ),
-            Text(
-              'Name of doctor: ',
-              style: TextStyle(
-                  color: Colors.green[400],
-                  fontSize: 22,
-                  fontStyle: FontStyle.normal),
-              textAlign: TextAlign.center,
+            Card(
+//                    color: Colors.blue[100],
+              color: Colors.white,
+              margin: EdgeInsets.all(5),
+              elevation: 0.7,
+              child: Column(
+                children: <Widget>[
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Doctor\'s name:  ',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text('Dr. ' + ((data['doctor_name']))),
+                  SizedBox(
+                    height: 10,
+                  ),
+                ],
+              ),
             ),
-            SizedBox(
-              height: 10,
+//            Text(
+//              'Name of doctor: ',
+//              style: TextStyle(
+//                  color: Colors.green[400],
+//                  fontSize: 22,
+//                  fontStyle: FontStyle.normal),
+//              textAlign: TextAlign.center,
+//            ),
+//            SizedBox(
+//              height: 10,
+//            ),
+//            Text(
+//              data['doctor_name'],
+//              style: TextStyle(
+//                  fontWeight: FontWeight.bold,
+//                  fontStyle: FontStyle.italic,
+//                  fontSize: 30),
+//              textAlign: TextAlign.center,
+//            ),
+//            Divider(
+//              color: Colors.blue,
+//            ),
+//            SizedBox(
+//              height: 10,
+//            ),
+            Card(
+//                    color: Colors.blue[100],
+              color: Colors.white,
+              margin: EdgeInsets.all(5),
+              elevation: 0.7,
+              child: Column(
+                children: <Widget>[
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Case History',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(((data['case_history']))),
+                  SizedBox(
+                    height: 10,
+                  ),
+                ],
+              ),
             ),
-            Text(
-              data['doctor_name'],
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontStyle: FontStyle.italic,
-                  fontSize: 30),
-              textAlign: TextAlign.center,
+//            Text(
+//              'Case history',
+//              style: TextStyle(color: Colors.green[400], fontSize: 22),
+//              textAlign: TextAlign.center,
+//            ),
+//            SizedBox(height: 10),
+//            Text(
+//              data['case_history'],
+//              style: TextStyle(
+//                  fontStyle: FontStyle.italic,
+//                  fontSize: 20,
+//                  fontWeight: FontWeight.bold),
+//              textAlign: TextAlign.center,
+//            ),
+//            Divider(
+//              color: Colors.green[400],
+//            ),
+            Card(
+//                    color: Colors.blue[100],
+              color: Colors.white,
+              margin: EdgeInsets.all(5),
+              elevation: 0.7,
+              child: Column(
+                children: <Widget>[
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    'Medication',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(((data['medication']))),
+                  SizedBox(
+                    height: 10,
+                  ),
+                ],
+              ),
             ),
-            Divider(
-              color: Colors.blue,
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              'Case history',
-              style: TextStyle(color: Colors.green[400], fontSize: 22),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 10),
-            Text(
-              data['case_history'],
-              style: TextStyle(
-                  fontStyle: FontStyle.italic,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            Divider(
-              color: Colors.green[400],
-            ),
-            Text(
-              'Medication',
-              style: TextStyle(color: Colors.green[400], fontSize: 22),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Text(
-              data['medication'],
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontStyle: FontStyle.italic,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24),
-            ),
-            Divider(
-              color: Colors.green[400],
-            ),
+//            Text(
+//              'Medication',
+//              style: TextStyle(color: Colors.green[400], fontSize: 22),
+//              textAlign: TextAlign.center,
+//            ),
+//            SizedBox(
+//              height: 10,
+//            ),
+//            Text(
+//              data['medication'],
+//              textAlign: TextAlign.center,
+//              style: TextStyle(
+//                  fontStyle: FontStyle.italic,
+//                  fontWeight: FontWeight.bold,
+//                  fontSize: 24),
+//            ),
+//            Divider(
+//              color: Colors.green[400],
+//            ),
             SizedBox(
               height: 10,
             ),
@@ -211,7 +279,7 @@ class _PrescriptionViewState extends State<PrescriptionView> {
                 ? FlatButton(
                     child: Text(
                       'submit to pharmacist',
-                      style: TextStyle(color: Colors.red),
+                      style: TextStyle(color: Colors.lightBlueAccent),
                     ),
                     onPressed: confirmSubmission,
                   )
@@ -226,13 +294,12 @@ class _PrescriptionViewState extends State<PrescriptionView> {
             data['submitted'] == "1" && data['drug_issued'] == "1"
                 ? RaisedButton(
 //                   disabledColor: Color(10),
-                   elevation: 4,
+                    elevation: 4,
                     color: Colors.lightBlueAccent,
                     child: Text(
                       'pay for drug',
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 15, color: Colors.black),
-
                     ),
                     onPressed: payForDrug,
                   )

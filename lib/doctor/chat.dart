@@ -6,15 +6,15 @@ import 'package:keyboard_avoider/keyboard_avoider.dart';
 import 'package:v_healthcare/pusher_service_initial.dart';
 import 'package:v_healthcare/custom/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'custom/constants.dart';
+import 'package:v_healthcare/custom/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 final _firestore = Firestore.instance;
 
 class Chat extends StatefulWidget {
-  final doctorId;
+  final userId;
 
-  Chat(this.doctorId);
+  Chat(this.userId);
 
   @override
   _ChatState createState() => _ChatState();
@@ -58,13 +58,13 @@ class _ChatState extends State<Chat> {
       'sender': 'patient',
     };
     final http.Response response =
-        await http.post('$remoteUrl/api/patient/doctor/message',
-            headers: {
-              HttpHeaders.authorizationHeader: 'Bearer $idToken',
-              HttpHeaders.contentTypeHeader: 'application/json',
-              HttpHeaders.acceptHeader: 'application/json'
-            },
-            body: json.encode(data));
+    await http.post('$remoteUrl/api/patient/doctor/message',
+        headers: {
+          HttpHeaders.authorizationHeader: 'Bearer $idToken',
+          HttpHeaders.contentTypeHeader: 'application/json',
+          HttpHeaders.acceptHeader: 'application/json'
+        },
+        body: json.encode(data));
 
     print(response.statusCode);
   }
@@ -128,7 +128,7 @@ class _ChatState extends State<Chat> {
                         //Implement send functionality.
                         messageTextController.clear();
                         final SharedPreferences prefs =
-                            await SharedPreferences.getInstance();
+                        await SharedPreferences.getInstance();
 
                         String userId = prefs.getString('id');
                         _firestore.collection("messages").add({
@@ -199,14 +199,14 @@ class _MessagesStreamState extends State<MessagesStream> {
 
         for (var message in messages) {
           final messageText = message.data['message'];
-          final messageSender = message.data['user_id'];
-          final messageReceiver = message.data['doctor_id'];
+          final messageSender = message.data['doctor_id'];
+          final messageReceiver = message.data['user_id'];
           final currentUser = userId;
 
           final messageBubble = MessageBubble(
             sender: messageSender,
             text: messageText,
-            isMe: message.data['sender'] == 'patient',
+            isMe: message.data['sender'] == 'doctor',
           );
 //          print(messageSender);
           print(doctorId);
@@ -240,20 +240,20 @@ class MessageBubble extends StatelessWidget {
       padding: EdgeInsets.all(10.0),
       child: Column(
         crossAxisAlignment:
-            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: <Widget>[
 //          Text(sender),
           Material(
             elevation: 5.0,
             borderRadius: isMe
                 ? BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30))
+                topLeft: Radius.circular(30),
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30))
                 : BorderRadius.only(
-                    topRight: Radius.circular(30),
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30)),
+                topRight: Radius.circular(30),
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30)),
             color: isMe ? Colors.lightBlueAccent : Colors.white,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
