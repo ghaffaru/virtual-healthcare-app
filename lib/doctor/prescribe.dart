@@ -6,7 +6,12 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'dart:convert';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:v_healthcare/custom/constants.dart';
 class Prescribe extends StatefulWidget {
+  final int userId;
+
+  Prescribe({this.userId});
+
   @override
   _PrescribeState createState() => _PrescribeState();
 }
@@ -15,10 +20,28 @@ class _PrescribeState extends State<Prescribe> {
   final GlobalKey<FormState> formKey = GlobalKey();
   TextEditingController caseHistoryEditingController = TextEditingController();
   TextEditingController medicationEditingController = TextEditingController();
+  String userName;
   bool showSpinner = false;
   String caseHistory;
   String medication;
 
+  void getUser() async {
+//    final idToken = widget.token;
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String idToken = prefs.getString('token');
+    final userId = widget.userId;
+    final http.Response response =
+    await http.get('$remoteUrl/api/getPatient/$userId', headers: {
+//      HttpHeaders.authorizationHeader: 'Bearer $idToken',
+      HttpHeaders.contentTypeHeader: 'application/json'
+    });
+
+    print(response.body);
+    setState(() {
+      userName = json.decode(response.body)['data']['name'];
+    });
+
+  }
   void submitForm() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String idToken = prefs.getString('token');
@@ -37,7 +60,7 @@ class _PrescribeState extends State<Prescribe> {
       showSpinner = true;
     });
     final Map<String, dynamic> data = {
-      'user_id': 1,
+      'user_id': widget.userId,
       'case_history': caseHistory,
       'medication': medication,
     };
@@ -78,6 +101,17 @@ class _PrescribeState extends State<Prescribe> {
   }
 
   @override
+  void initState() {
+    getUser();
+    super.initState();
+  }
+
+  @override
+  void didUpdateWidget(Prescribe oldWidget) {
+    getUser();
+    super.didUpdateWidget(oldWidget);
+  }
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -90,7 +124,7 @@ class _PrescribeState extends State<Prescribe> {
 //        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Text(
-              'Patient Name: Ghaffaru Mudashiru',
+              'Patient Name: $userName',
               style: TextStyle(fontSize: 20),
             ),
             SizedBox(

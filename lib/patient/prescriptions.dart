@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class Prescriptions extends StatefulWidget {
   final String token;
+
   Prescriptions({this.token});
 
   @override

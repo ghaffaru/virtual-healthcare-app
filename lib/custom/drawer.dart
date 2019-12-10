@@ -31,15 +31,15 @@ class DrawerWidget extends StatelessWidget {
                           )));
             },
           ),
-          ListTile(
-            title: Text('My Appointments'),
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (BuildContext context) => Appointments(token)));
-            },
-          ),
+//          ListTile(
+//            title: Text('My Appointments'),
+//            onTap: () {
+//              Navigator.push(
+//                  context,
+//                  MaterialPageRoute(
+//                      builder: (BuildContext context) => Appointments(token)));
+//            },
+//          ),
 //          ListTile(
 //            title: Text('Request an ambulance'),
 //            onTap: () {

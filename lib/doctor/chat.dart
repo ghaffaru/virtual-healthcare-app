@@ -8,6 +8,7 @@ import 'package:v_healthcare/custom/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:v_healthcare/custom/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'prescribe.dart';
 
 final _firestore = Firestore.instance;
 
@@ -58,13 +59,13 @@ class _ChatState extends State<Chat> {
       'sender': 'doctor',
     };
     final http.Response response =
-    await http.post('$remoteUrl/api/doctor/patient/chat',
-        headers: {
-          HttpHeaders.authorizationHeader: 'Bearer $idToken',
-          HttpHeaders.contentTypeHeader: 'application/json',
-          HttpHeaders.acceptHeader: 'application/json'
-        },
-        body: json.encode(data));
+        await http.post('$remoteUrl/api/doctor/patient/chat',
+            headers: {
+              HttpHeaders.authorizationHeader: 'Bearer $idToken',
+              HttpHeaders.contentTypeHeader: 'application/json',
+              HttpHeaders.acceptHeader: 'application/json'
+            },
+            body: json.encode(data));
 
     print(response.statusCode);
   }
@@ -93,10 +94,19 @@ class _ChatState extends State<Chat> {
         appBar: new AppBar(
           leading: null,
           actions: <Widget>[
+//            Text('Create Prescription'),
             IconButton(
-                icon: Icon(Icons.close),
+                icon: Icon(Icons.book),
+                tooltip: 'Create prescription',
                 onPressed: () {
                   //Implement logout functionality
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (
+                        BuildContext context,
+                      ) =>
+                              Prescribe(userId: widget.userId,)));
                 }),
           ],
           title: Text('⚡️Chat'),
@@ -128,7 +138,7 @@ class _ChatState extends State<Chat> {
                         //Implement send functionality.
                         messageTextController.clear();
                         final SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
+                            await SharedPreferences.getInstance();
 
                         String doctorId = prefs.getString('doctor_id');
                         _firestore.collection("messages").add({
@@ -136,7 +146,8 @@ class _ChatState extends State<Chat> {
                           'doctor_id': doctorId.toString(),
                           'message': messageText,
                           'sender': 'doctor',
-                          'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
+                          'timestamp':
+                              DateTime.now().millisecondsSinceEpoch.toString(),
                         });
 
                         sendMessage();
@@ -190,7 +201,10 @@ class _MessagesStreamState extends State<MessagesStream> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: _firestore.collection("messages").orderBy('timestamp', descending: true).snapshots(),
+      stream: _firestore
+          .collection("messages")
+          .orderBy('timestamp', descending: true)
+          .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return Center(child: Text(''));
@@ -241,20 +255,20 @@ class MessageBubble extends StatelessWidget {
       padding: EdgeInsets.all(10.0),
       child: Column(
         crossAxisAlignment:
-        isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: <Widget>[
 //          Text(sender),
           Material(
             elevation: 5.0,
             borderRadius: isMe
                 ? BorderRadius.only(
-                topLeft: Radius.circular(30),
-                bottomLeft: Radius.circular(30),
-                bottomRight: Radius.circular(30))
+                    topLeft: Radius.circular(30),
+                    bottomLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30))
                 : BorderRadius.only(
-                topRight: Radius.circular(30),
-                bottomLeft: Radius.circular(30),
-                bottomRight: Radius.circular(30)),
+                    topRight: Radius.circular(30),
+                    bottomLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30)),
             color: isMe ? Colors.lightBlueAccent : Colors.white,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),

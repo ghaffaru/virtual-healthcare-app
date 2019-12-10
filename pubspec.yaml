@@ -34,6 +34,8 @@ dependencies:
   firebase_core: ^0.4.0+5
 #  firebase_auth: ^0.14.0+5
   cloud_firestore: ^0.12.11
+  flutter_pdf_renderer: ^1.3.2
+  path_provider: ^1.4.0
 
 dev_dependencies:
   flutter_test:

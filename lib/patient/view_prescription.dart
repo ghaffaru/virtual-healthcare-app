@@ -3,7 +3,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'package:v_healthcare/custom/constants.dart';
-
+import 'package:flutter_pdf_renderer/flutter_pdf_renderer.dart';
+import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 class PrescriptionView extends StatefulWidget {
   final int prescriptionId;
   final String idToken;
@@ -15,6 +18,9 @@ class PrescriptionView extends StatefulWidget {
 }
 
 class _PrescriptionViewState extends State<PrescriptionView> {
+
+  Future<String> downloadedFilePath;
+
   Map<String, dynamic> data;
 
   Future getPrescription() async {
@@ -32,6 +38,10 @@ class _PrescriptionViewState extends State<PrescriptionView> {
       data = jsonDecode(response.body)['data'];
     });
 
+//    setState(() {
+//      downloadedFilePath = data['file'];
+//    });
+    print(data['file']);
     print(data);
   }
 
@@ -61,10 +71,33 @@ class _PrescriptionViewState extends State<PrescriptionView> {
         });
   }
 
+  Future<String> downloadPdfFile(String url) async {
+    final filename = url.substring(url.lastIndexOf("/") + 1);
+    String dir = (await getTemporaryDirectory()).path;
+    File file = new File('$dir/$filename');
+    bool exist = false;
+    try {
+      await file.length().then((len) {
+        exist = true;
+      });
+    } catch (e) {
+      print(e);
+    }
+    if (!exist) {
+      var request = await HttpClient().getUrl(Uri.parse(url));
+      var response = await request.close();
+      var bytes = await consolidateHttpClientResponseBytes(response);
+      await file.writeAsBytes(bytes);
+    }
+    return file.path;
+  }
+
   Future submitToPharmacist() async {
-    final idToken = widget.idToken;
+//    final idToken = widget.idToken;
     final prescriptionId = widget.prescriptionId;
 
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String idToken = prefs.getString('token');
     final http.Response response = await http.put(
         '$remoteUrl/api/patient/prescription/$prescriptionId/submit',
         headers: {
@@ -125,6 +158,12 @@ class _PrescriptionViewState extends State<PrescriptionView> {
     super.didUpdateWidget(oldWidget);
   }
 
+  void download() {
+    setState(() {
+      downloadedFilePath = downloadPdfFile(data['file']);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -133,7 +172,7 @@ class _PrescriptionViewState extends State<PrescriptionView> {
       ),
       body: Container(
         decoration: BoxDecoration(),
-        child: ListView(
+        child: data != null ? ListView(
           padding: EdgeInsets.all(10),
           children: <Widget>[
             SizedBox(
@@ -275,6 +314,30 @@ class _PrescriptionViewState extends State<PrescriptionView> {
             SizedBox(
               height: 10,
             ),
+            FlatButton(child: Text('Download Prescription', style: TextStyle(color: Colors.lightBlueAccent),),onPressed: download, ),
+            FutureBuilder<String>(
+              future: downloadedFilePath,
+              builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                Text text = Text('');
+                if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.hasError) {
+                    text = Text('Error: ${snapshot.error}');
+                  } else if (snapshot.hasData) {
+//                    text = Text('Data: ${snapshot.data}');
+//                    return PdfRenderer(pdfFile: snapshot.data, width: 500.0);
+                  } else {
+                    text = Text('Unavailable');
+                  }
+                } else if (snapshot.connectionState == ConnectionState.waiting) {
+                  text = Text('Downloading PDF File...');
+                } else {
+//                  text = Text('Please load a PDF file.');
+                }
+                return Container(
+                  child: text,
+                );
+              },
+            ),
             data['submitted'] == "0"
                 ? FlatButton(
                     child: Text(
@@ -286,7 +349,7 @@ class _PrescriptionViewState extends State<PrescriptionView> {
                 : Text(
                     'status : submitted ',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.red, fontSize: 20),
+                    style: TextStyle(color: Colors.red),
                   ),
             SizedBox(
               height: 10,
@@ -307,11 +370,11 @@ class _PrescriptionViewState extends State<PrescriptionView> {
                     ? Text(
                         "drug issued : pending",
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 20),
+
                       )
                     : Text("")
           ],
-        ),
+        ) : Text(''),
       ),
     );
   }

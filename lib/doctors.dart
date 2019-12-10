@@ -10,6 +10,8 @@ import 'custom/drawer.dart';
 import 'package:v_healthcare/custom/constants.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:v_healthcare/doctor_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 class Doctors extends StatefulWidget {
   String token;
 
@@ -113,7 +115,9 @@ class _DoctorsState extends State<Doctors> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.search),
-            onPressed: () {},
+            onPressed: () {
+              showSearch(context: context, delegate: DataSearch(data));
+            },
           )
         ],
       ),
@@ -127,8 +131,6 @@ class _DoctorsState extends State<Doctors> {
                 itemCount: data == null ? 0 : data.length,
                 itemBuilder: (BuildContext context, int index) {
                   return GestureDetector(
-
-
                     onTap: () {
                       Navigator.push(
                           context,
@@ -144,15 +146,21 @@ class _DoctorsState extends State<Doctors> {
 //              padding: EdgeInsets.all(5),
                       child: Column(
                         children: <Widget>[
-                          SizedBox(height: 10,),
+                          SizedBox(
+                            height: 10,
+                          ),
                           Row(
                             children: <Widget>[
-                              Image.asset('images/doctor.jpg', height: 100, width: 100,),
-
-                              SizedBox(width: 30,),
+                              Image.asset(
+                                'images/doctor.jpg',
+                                height: 100,
+                                width: 100,
+                              ),
+                              SizedBox(
+                                width: 30,
+                              ),
                               Column(
                                 children: <Widget>[
-
                                   Text(
                                     'Dr. ' + data[index]['name'],
                                     style: TextStyle(fontSize: 20),
@@ -164,7 +172,9 @@ class _DoctorsState extends State<Doctors> {
                                   Text(data[index]['title'] +
                                       ' | ' +
                                       data[index]['specialization']),
-                                  SizedBox(height: 15,)
+                                  SizedBox(
+                                    height: 15,
+                                  )
                                 ],
                               )
                             ],
@@ -204,6 +214,88 @@ class _DoctorsState extends State<Doctors> {
                 child: Text('No doctors available'),
               ),
       ),
+    );
+  }
+}
+
+class DataSearch extends SearchDelegate<String> {
+  final List data;
+
+  DataSearch(this.data);
+
+//  Future getDoctors() async {
+//    final http.Response response = await http.get('$remoteUrl/api/doctors',
+//        headers: {
+//          'Content-Type': 'application/json',
+//          'accept': 'application/json'
+//        });
+//
+//    return json.decode(response.body)['data'];
+//
+////    print(response.body);
+//  }
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: Icon(Icons.clear),
+        onPressed: () {
+          query = "";
+        },
+      )
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      icon: AnimatedIcon(
+          icon: AnimatedIcons.menu_arrow, progress: transitionAnimation),
+      onPressed: () {
+        close(context, null);
+      },
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    // TODO: implement buildResults
+
+    return null;
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    final suggestionList = query.isEmpty
+        ? this.data
+        : this.data.where((p) => p['name'].startsWith(query)).toList();
+
+    return ListView.builder(
+      itemBuilder: (context, index) => ListTile(
+        onTap: () {
+//          showResults(context);
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      DoctorView(suggestionList[index])));
+        },
+        leading: Icon(Icons.local_hospital),
+        title: RichText(
+            text: TextSpan(
+                text: suggestionList[index]['name'].substring(0, query.length),
+                style:
+                    TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                children: [
+              TextSpan(
+                  text: suggestionList[index]['name'].substring(query.length),
+                  style: TextStyle(color: Colors.grey)),
+                  TextSpan(text: ' | '),
+                  TextSpan(text: suggestionList[index]['title'])
+            ])),
+      ),
+      itemCount: suggestionList.length,
     );
   }
 }

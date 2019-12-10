@@ -13,8 +13,8 @@ final _firestore = Firestore.instance;
 
 class Chat extends StatefulWidget {
   final doctorId;
-
-  Chat(this.doctorId);
+  final doctorStatus;
+  Chat(this.doctorId,this.doctorStatus);
 
   @override
   _ChatState createState() => _ChatState();
@@ -99,7 +99,7 @@ class _ChatState extends State<Chat> {
                   //Implement logout functionality
                 }),
           ],
-          title: Text('⚡️Chat'),
+          title: widget.doctorStatus ? Text('⚡Online') : Text('Offline'),
           backgroundColor: Colors.lightBlueAccent,
         ),
         body: SafeArea(

@@ -70,17 +70,17 @@ class _PatientLoginState extends State<PatientLogin> {
   }
 
   Future<Map<String, dynamic>> login() async {
-    try {
-      final result = await InternetAddress.lookup('google.com');
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        print('connected');
-      }
-    } on SocketException catch (_) {
-      setState(() {
-        showSpinner = false;
-        error = 'No connection';
-      });
-    }
+//    try {
+//      final result = await InternetAddress.lookup('google.com');
+//      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+//        print('connected');
+//      }
+//    } on SocketException catch (_) {
+//      setState(() {
+//        showSpinner = false;
+//        error = 'No connection';
+//      });
+//    }
 
     final Map<String, dynamic> data = {
       'grant_type': 'password',

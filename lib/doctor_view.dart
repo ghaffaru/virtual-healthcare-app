@@ -97,7 +97,7 @@ class _DoctorViewState extends State<DoctorView> {
                   context,
                   MaterialPageRoute(
                       builder: (BuildContext context) =>
-                          Chat(widget.doctor['id'])));
+                          Chat(widget.doctor['id'],widget.doctor['is_online'])));
             },
             child: Text('CHAT THIS DOCTOR')),
       ),
